@@ -5,7 +5,7 @@ export default function middleware(req) {
     path: new URL(req.url).pathname,
     ua: req.headers.get('user-agent'),
     country: req.headers.get('x-vercel-ip-country'),
-    city: req.headers.get('x-vercel-ip-city'),
+    city: decodeURIComponent(req.headers.get('x-vercel-ip-city') || ''),
     time: new Date().toISOString()
   }));
 }
