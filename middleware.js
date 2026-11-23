@@ -1,11 +1,20 @@
 export default function middleware(req) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip');
+  const h = (k) => req.headers.get(k);
+  const dec = (k) => decodeURIComponent(h(k) || '');
   console.log(JSON.stringify({
-    ip,
+    type: 'visit',
+    ip: h('x-forwarded-for')?.split(',')[0]?.trim() || h('x-real-ip'),
     path: new URL(req.url).pathname,
-    ua: req.headers.get('user-agent'),
-    country: req.headers.get('x-vercel-ip-country'),
-    city: decodeURIComponent(req.headers.get('x-vercel-ip-city') || ''),
+    ua: h('user-agent'),
+    country: h('x-vercel-ip-country'),
+    region: h('x-vercel-ip-country-region'),
+    city: dec('x-vercel-ip-city'),
+    postal: h('x-vercel-ip-postal-code'),
+    lat: h('x-vercel-ip-latitude'),
+    lon: h('x-vercel-ip-longitude'),
+    tz: h('x-vercel-ip-timezone'),
+    referer: h('referer'),
+    lang: h('accept-language'),
     time: new Date().toISOString()
   }));
 }

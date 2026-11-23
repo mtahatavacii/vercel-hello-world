@@ -7,5 +7,33 @@
 </head>
 <body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
   <h1>Hello World from Vercel!</h1>
+  <script>
+    (() => {
+      const sid = Math.random().toString(36).slice(2, 10);
+      const start = Date.now();
+      const send = (event, extra = {}) =>
+        navigator.sendBeacon('/api/log', JSON.stringify({ event, sid, ...extra }));
+
+      send('load', {
+        screen: `${screen.width}x${screen.height}`,
+        viewport: `${innerWidth}x${innerHeight}`,
+        dpr: devicePixelRatio,
+        mobile: matchMedia('(pointer:coarse)').matches,
+        lang: navigator.language,
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        referrer: document.referrer || null,
+        net: navigator.connection?.effectiveType || null
+      });
+
+      let sent = false;
+      const leave = () => {
+        if (sent) return;
+        sent = true;
+        send('leave', { seconds: Math.round((Date.now() - start) / 1000) });
+      };
+      addEventListener('pagehide', leave);
+      document.addEventListener('visibilitychange', () => document.visibilityState === 'hidden' && leave());
+    })();
+  </script>
 </body>
 </html>
